@@ -1,0 +1,4 @@
+CHECKLISTE VIGTIG
+
+createPayment.php SSL skal være sikker, fjern SSL-deaktivering
+createPayment.php DIBS skal have returnURL til HTTPS
