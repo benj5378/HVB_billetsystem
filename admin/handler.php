@@ -1,9 +1,4 @@
 <?php
-/* 
-    if(!($_GET["auth"] == "2#n#QXN@nP+H^Q%nqy=8Jqb5dYj3hJ=WsRpGL9@2")) {
-        print_r($_GET["auth"]);
-        die("auth");
-    } */
 
     include_once("./credentials.php");
 
@@ -14,18 +9,6 @@
     if ($mysqli->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
-
-    //var_dump($mysqli);
-    //var_dump($mysqli->connect_error);
-    
-    // print_r($mysqli -> query("INSERT INTO test VALUES ('test2')"));
-
-    // $result = $mysqli -> query("SELECT * FROM `test`");
-    // var_dump($result);
-    // $result = "asd";
-    // var_dump($result);
-
-    // exit("end");
 
     $json = json_decode(file_get_contents('php://input'), true);
 
