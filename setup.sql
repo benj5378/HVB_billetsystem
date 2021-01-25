@@ -84,3 +84,6 @@ ALTER TABLE hvb_ticket ADD CONSTRAINT fk_hvb_ticket_hvb_stops_0 FOREIGN KEY ( ti
 ALTER TABLE hvb_ticket ADD CONSTRAINT fk_hvb_ticket_hvb_payments FOREIGN KEY ( payments__payment_id ) REFERENCES hvb_payments( payment_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE hvb_trains ADD CONSTRAINT fk_hvb_trains_hvb_events FOREIGN KEY ( events__event_id ) REFERENCES hvb_events( event_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Set PLANTOG row
+INSERT INTO `hvb_events` (`event_id`, `event_type`, `event_date`, `event_description`) VALUES ('1', 'plantog', NULL, NULL);
