@@ -1,6 +1,6 @@
 <?php
 
-    include_once("./credentials.php");
+    include_once("./../credentials.php");
 
     // Create connection
     $mysqli = new mysqli($servername, $username, $password, $db);
@@ -121,6 +121,8 @@
                     $ret = "success";
                 } else {
                     $ret = "failure";
+                    // Print mysqli_stmt error
+                    print_r($stmtStop -> error);
                 }
 
                 print("<STOP " . $trainkey . " " . $departures__departure_id . " " . $ret . " " . $stop_id . " " . $stop_name . " " . $stop_departure_time . " " . $departures__departure_id . ">\xA");
