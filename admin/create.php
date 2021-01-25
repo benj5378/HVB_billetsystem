@@ -27,8 +27,8 @@
 
         html = "<div class=\"del\" id=\"id-" + id + "_div\">";
 
-        html += "Dato: <input id=\"id-" + id + "_date\" type=\"date\"/>";
-        html += "<br />";
+        html += "Datoer:<br/><div id=\"id-" + id + "_datecontainer\"><input type=\"date\"/></div><br/><button onclick=\"addDate('id-" + id + "')\">Tilføj dato</button>";
+        html += "<br /><br />";
 
         // create train type: motor, damp
         for(var trains = 0; trains < num_trains; trains++) {
@@ -93,7 +93,7 @@
 
         // RETURREJSE
 
-        html += "<table id=\"id-" + id + "_table_hjemrejse\">";
+        html += "<table id=\"id-" + id + "_table_returrejse\">";
         html += "<thead>";
         
         // add train types to header
@@ -146,13 +146,33 @@
         html += "</div>";
         
         document.getElementById("liste").innerHTML = html;
-        
-        console.log(html);
+    }
+
+    function addDate(id) {
+        var element = document.getElementById(id + "_datecontainer");
+        var html = "<br /><input type=\"date\"/>";
+
+        element.innerHTML += html;
     }
 
     function save(id) {
-        
-        date = document.getElementById(id + "_date").value;
+        var datecontainer = document.getElementById(id + "_datecontainer");
+        var dates_input = datecontainer.getElementsByTagName("input");
+        var dates = [];
+
+        for(var i = 0; i < dates_input.length; i++) {
+            dates.push(dates_input[i].value);
+        }
+
+        for(var i = 0; i < dates.length; i++) {
+            if(dates[i].value == "") {
+                continue;
+            }
+            call(id, dates[i])
+        }
+    }
+
+    function call(id, date) {
         table_udrejse = document.getElementById(id + "_table_udrejse");
         table_returrejse = document.getElementById(id + "_table_returrejse");
 
@@ -161,6 +181,17 @@
 
         // parse table to stop_data
         table = table_udrejse;
+        send(id, table, date);
+
+        table = table_returrejse;
+        send(id, table, date);
+    }
+
+    function send(id, table, date) {
+        console.log("Table:");
+        console.log(table);
+
+        // parse table to stop_data
         for (var i = 0, row; row = table.rows[i]; i++) {
             for (var j = 0, col; col = row.cells[j]; j++) {
 
@@ -209,10 +240,14 @@
 
         train_types = document.getElementsByClassName(id + "_traintype")
 
+        console.log(train_types);
+
         var train_data = JSON.parse("{}")
         for (var i = 0; i < train_types.length; i++) {
             train_data[train_types[i].getAttribute('data-train')] = train_types[i].value;
         }
+
+        console.log(train_data);
 
         json = JSON.parse("{}")
         json["stop_data"] = stop_data;
