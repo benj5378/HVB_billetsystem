@@ -6,46 +6,42 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitc8fdd39bfea49c1fc593f565d9755e1d
 {
-    public static $files = array (
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        's' => 
-        array (
-            'setasign\\Fpdi\\' => 14,
-        ),
-        'P' => 
-        array (
-            'Psr\\Log\\' => 8,
-        ),
-        'M' => 
-        array (
-            'Mpdf\\' => 5,
-        ),
         'D' => 
         array (
-            'DeepCopy\\' => 9,
+            'Delight\\Http\\' => 13,
+            'Delight\\Db\\' => 11,
+            'Delight\\Cookie\\' => 15,
+            'Delight\\Base64\\' => 15,
+            'Delight\\Auth\\' => 13,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'setasign\\Fpdi\\' => 
+        'Delight\\Http\\' => 
         array (
-            0 => __DIR__ . '/..' . '/setasign/fpdi/src',
+            0 => __DIR__ . '/..' . '/delight-im/http/src',
         ),
-        'Psr\\Log\\' => 
+        'Delight\\Db\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+            0 => __DIR__ . '/..' . '/delight-im/db/src',
         ),
-        'Mpdf\\' => 
+        'Delight\\Cookie\\' => 
         array (
-            0 => __DIR__ . '/..' . '/mpdf/mpdf/src',
+            0 => __DIR__ . '/..' . '/delight-im/cookie/src',
         ),
-        'DeepCopy\\' => 
+        'Delight\\Base64\\' => 
         array (
-            0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
+            0 => __DIR__ . '/..' . '/delight-im/base64/src',
         ),
+        'Delight\\Auth\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/delight-im/auth/src',
+        ),
+    );
+
+    public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -53,6 +49,7 @@ class ComposerStaticInitc8fdd39bfea49c1fc593f565d9755e1d
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitc8fdd39bfea49c1fc593f565d9755e1d::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitc8fdd39bfea49c1fc593f565d9755e1d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitc8fdd39bfea49c1fc593f565d9755e1d::$classMap;
 
         }, null, ClassLoader::class);
     }
