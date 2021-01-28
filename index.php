@@ -554,7 +554,7 @@ require "functions/getStops.php"
 
                         $lastStops = getLastStops($mysqli, $date, "outbond");
 
-                        printDepartureCards($firstStops, $lastStops, "udrejsetid")
+                        printDepartureCards($mysqli, $firstStops, $lastStops, "udrejsetid")
 
                         ?>
                     </div>
@@ -575,7 +575,7 @@ require "functions/getStops.php"
 
                         $lastStops = getLastStops($mysqli, $date, "homebond");
 
-                        printDepartureCards($firstStops, $lastStops, "hjemrejsetid")
+                        printDepartureCards($mysqli, $firstStops, $lastStops, "hjemrejsetid")
 
                         ?>
                     </div>

@@ -30,6 +30,7 @@ function getFirstStops($mysqli, $date, $departure_type)
     $stmtFirstStops->execute(); // execute */
     $firstStopsResult = $stmtFirstStops->get_result();
 
+
     $firstStops = [];
     while ($row = mysqli_fetch_row($firstStopsResult)) {
         // [stop_name, stop_departure_time, departures__departure_id]
@@ -83,13 +84,19 @@ function getLastStops($mysqli, $date, $departure_type)
     return $lastStops;
 }
 
-function printDepartureCards($firstStops, $lastStops, $radioclass)
+function printDepartureCards($mysqli, $firstStops, $lastStops, $radioclass)
 {
 
     // Check that results line up
     if (count($firstStops) != count($lastStops)) {
         die("Fatal error: Not matching queries!!");
     }
+
+    $sql = "SELECT `train_locomotive` FROM `hvb_trains` WHERE `train_id` IN (SELECT `trains__train_id` FROM `hvb_departures` WHERE `departure_id`=?)";
+
+    $stmtTraintype = $mysqli->prepare($sql);
+    $stmtTraintype->bind_param("i", $departureId);
+
 
     for ($i = 0; $i < count($firstStops); $i++) {
         if ($firstStops[$i][2] != $lastStops[$i][2]) {
@@ -102,6 +109,15 @@ function printDepartureCards($firstStops, $lastStops, $radioclass)
         $endStopTime = mb_substr($lastStops[$i][1], 0, 5);
         $departureId = $firstStops[$i][2];
 
+        $stmtTraintype->execute();
+        $trainTypeResult = $stmtTraintype->get_result();
+        $trainTypeEnum = mysqli_fetch_row($trainTypeResult)[0];
+        if($trainTypeEnum == "motor") {
+            $trainType = "Motor";
+        } else if($trainTypeEnum == "damp") {
+            $trainType = "Damp";
+        }
+
 ?>
         <div class="time" onclick="radioChoose(this)" data-radioclass="<?php print($radioclass) ?>" data-departureId="<?php print($departureId) ?>">
             <div><span>
@@ -113,7 +129,7 @@ function printDepartureCards($firstStops, $lastStops, $radioclass)
                     </span>
                     <?php print($endStopTime) ?>
                 </span></div>
-            <div class="type"><span>Motor</span></div>
+            <div class="type"><span><?php print($trainType) ?></span></div>
             <div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
         </div>
 <?php
