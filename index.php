@@ -565,6 +565,11 @@ require "functions/getStops.php"
 
             <h3>Returrejse</h3>
             <div class="timeContainer">
+                <div>
+                    <div class="time" onclick="radioChoose(this)" data-radioclass="hjemrejsetid">
+                        <div><span>Ingen - jeg ønsker ingen returbillet</span></div>
+                    </div>
+                </div>
                 <?php
                 foreach ($allDates as &$date) {
                 ?>
