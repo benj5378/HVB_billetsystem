@@ -1,42 +1,7 @@
 <html>
 
 <head>
-    <style>
-        body {
-            font-size: 1.5em;
-        }
-
-        * {
-            font-family: 'Gill Sans', 'Gill Sans MT', 'Lato', Calibri, 'Trebuchet MS', sans-serif;
-        }
-
-        form {
-            display: flex;
-            flex-flow: column;
-            max-width: 500px;
-            margin: 125px auto 0 auto;
-        }
-
-        form > input {
-            margin-bottom: 0.2em;
-            font-size: 1em;
-            padding: 0.25em;
-        }
-
-        form > #submit {
-            background-color: black;
-            color: white;
-            border: 0;
-        }
-
-        #logo {
-            height: 2.5em;
-            max-width: 90vw;
-            position: absolute;
-            bottom: 0.5em;
-            right: 0.5em
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
