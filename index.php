@@ -1,27 +1,32 @@
 <?php
-    header('Content-Type: text/html; charset=UTF-8');
+header('Content-Type: text/html; charset=UTF-8');
 
-    $result = setlocale(LC_ALL, 'da_DK');
+$result = setlocale(LC_ALL, 'da_DK');
 
-    include_once("./credentials.php");
+include_once("./credentials.php");
 
-    // Create connection
-    $mysqli = new mysqli($servername, $username, $password, $db);
+// Create connection
+$mysqli = new mysqli($servername, $username, $password, $db);
 
-    // Check connection
-    if ($mysqli->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+// Check connection
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+require "functions/getStops.php"
+
 
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
         @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+
         @font-face {
             font-family: "Gilroy-Bold";
             src: url(fonts/Gilroy-Bold.ttf);
@@ -41,7 +46,8 @@
             display: flex;
         }
 
-        h2, h3 {
+        h2,
+        h3 {
             font-family: "Raleway";
             font-weight: bold;
         }
@@ -88,12 +94,13 @@
             justify-content: space-between;
             background-color: rgb(230, 230, 230);
             padding: 0.5em;
-            margin-bottom: 6px
+            margin-bottom: 6px;
+            cursor: pointer;
         }
 
         .time>div:first-child {
             flex: 1;
-            max-width: 700px
+            max-width: 700px;
         }
 
         .time>div:not(:first-child) {
@@ -114,7 +121,8 @@
             margin: 2px;
             cursor: pointer;
             font-family: "Gilroy-Bold"
-         }
+        }
+
         /*
         .time>div>a {
             font-family: "Gilroy-Bold";
@@ -171,7 +179,7 @@
             flex-wrap: wrap;
         }
 
-        #travellers > span {
+        #travellers>span {
             background-color: rgb(230, 230, 230);
             padding: 0.3em 0.8em;
             display: flex;
@@ -186,7 +194,7 @@
             margin: 0 1em;
         }*/
 
-        #travellers > span > input {
+        #travellers>span>input {
             font-size: 1em;
             padding: 0.08em;
             margin-left: 1em;
@@ -195,7 +203,7 @@
             font-family: inherit;
         }
 
-        #travellers > span > span > .meta {
+        #travellers>span>span>.meta {
             display: inline-block;
             font-size: 0.6em;
             font-style: italic;
@@ -205,17 +213,17 @@
             margin-bottom: 0.8em;
         }
 
-        #summary > div > div {
+        #summary>div>div {
             display: flex;
             justify-content: space-between;
             max-width: 700px;
         }
 
-        #summary > div:last-child > div > span {
+        #summary>div:last-child>div>span {
             font-weight: bold;
         }
 
-        #summary > div:not(:last-child) {
+        #summary>div:not(:last-child) {
             border-bottom: 1px solid rgb(51, 153, 255);
         }
 
@@ -252,11 +260,12 @@
             color: white;
         }
 
-        .type > span {
+        .type>span {
             min-width: 3em;
         }
 
-        .info { /* contact information */
+        .info {
+            /* contact information */
             background-color: rgb(230, 230, 230);
             padding: 0.3em 0.8em;
             display: flex;
@@ -265,7 +274,7 @@
             margin-bottom: 1em;
         }
 
-        .info > div > input {
+        .info>div>input {
             font-size: 1em;
             font-family: "Gill Sans MT";
             padding: 0.1em 0.3em;
@@ -273,7 +282,7 @@
             flex: 1;
         }
 
-        .info > div {
+        .info>div {
             display: flex;
             justify-content: space-between;
             width: 100%;
@@ -282,18 +291,17 @@
             flex-wrap: wrap;
         }
 
-        .info > div > span {
+        .info>div>span {
             width: 9.375em;
         }
 
-        .info > div:not(:last-child) {
+        .info>div:not(:last-child) {
             margin-bottom: 0.2em;
         }
     </style>
     <script src="https://test.checkout.dibspayment.eu/v1/checkout.js?v=1"></script>
     <script src="./scripts/view2.0.js"></script>
     <script>
-
         var prices = {
             "enkelt": {
                 "Voksen 12+ år": 44,
@@ -321,7 +329,7 @@
             // Get choosen ticket types
             var ticketElements = document.getElementsByClassName("ticketTypeNumber");
             var ticketOption = "enkelt"; //document.querySelector(".turreturButton.active").getAttribute("data-option");
-            
+
             summary.innerHTML = "";
 
             var totalPrice = 0;
@@ -330,7 +338,7 @@
                 var product = ticketElements[i].getAttribute("data-ticket-type") + " " + ticketOption;
                 var count = ticketElements[i].value;
                 var price = prices[ticketOption][ticketElements[i].getAttribute("data-ticket-type")] * count;
-                var html = "<div class=\"summary-item\" data-product=\""+ product + "\" data-product-count=\"" + count + "\"><div><span>" + count + " " + product + "</span><span>" + price + " kr.</span></div></div>";
+                var html = "<div class=\"summary-item\" data-product=\"" + product + "\" data-product-count=\"" + count + "\"><div><span>" + count + " " + product + "</span><span>" + price + " kr.</span></div></div>";
                 totalPrice += price;
                 summaryElement.innerHTML += html;
             }
@@ -341,11 +349,11 @@
             // - DO TIME SUMMARY UDREJSE
 
             var choosenTicketIdUdrejse = document.querySelectorAll("[data-radioclass='udrejserejsetid']").getAttribute("data-trainnumber") //document.querySelector(".time.active").getAttribute("data-train-number");
-            
+
             document.getElementById("summaryUdrejse").innerHTML = ""; // += "<span class=\"italic\">Udtur</span><br />" + ticketHTML;
 
             var request = new XMLHttpRequest();
-            request.open('GET', '/getTime.php?id=' + choosenTicketIdUdrejse, true);  // `false` makes the request synchronous
+            request.open('GET', '/getTime.php?id=' + choosenTicketIdUdrejse, true); // `false` makes the request synchronous
             request.send(null);
             if (request.status === 200) {
                 // TO DO SKAL PARSES, idé: JSON FRA PHP
@@ -355,16 +363,15 @@
             // - DO TIME SUMMARY RETURREJSE
 
             var choosenTicketIdReturrejse = document.querySelectorAll("[data-radioclass='returrejsetid']").getAttribute("data-trainnumber") //document.querySelector(".time.active").getAttribute("data-train-number");
-            
+
             document.getElementById("summaryReturrejse").innerHTML = ""; // += "<span class=\"italic\">Udtur</span><br />" + ticketHTML;
 
             // Tjek om der skal være returrejse. Hvis ja, så hent togdata på samme måde, som for udrejse
-            if(choosenTicketIdReturrejse == "ingenreturrejse") {
+            if (choosenTicketIdReturrejse == "ingenreturrejse") {
                 document.getElementById("summaryReturrejse").innerHTML += "Ingen returrejse"; //"<span class=\"italic\">Udtur</span><br /><div class=\"time\">Returbilletten gælder til et valgfrit tog mod Hedehusgårds</div>"
-            }
-            else {
+            } else {
                 var request = new XMLHttpRequest();
-                request.open('GET', '/getTime.php?id=' + choosenTicketIdReturrejse, true);  // `false` makes the request synchronous
+                request.open('GET', '/getTime.php?id=' + choosenTicketIdReturrejse, true); // `false` makes the request synchronous
                 request.send(null);
                 if (request.status === 200) {
                     // TO DO SKAL PARSES, idé: JSON FRA PHP
@@ -389,11 +396,11 @@
 
             update();
         }
-        
-        function radioChoose(origin, doUpdate=true) {
+
+        function radioChoose(origin, doUpdate = true) {
             // Find all elements with same radioclass
             var elements = document.querySelectorAll("[data-radioclass='" + origin.getAttribute('data-radioclass') + "']"); //document.getElementsByClassName(origin.className);
-            for(var i = 0; i < elements.length; i++) {
+            for (var i = 0; i < elements.length; i++) {
                 elements[i].classList.remove("active");
             }
             origin.classList.add("active");
@@ -415,17 +422,17 @@
         function complete() {
             var request = new XMLHttpRequest();
             var summaryitems = document.getElementsByClassName("summary-item");
-            
+
             var postdata = new Object();
             postdata["tickets"] = {};
-            for(var i = 0; i < summaryitems.length; i++) {
+            for (var i = 0; i < summaryitems.length; i++) {
                 postdata["tickets"][summaryitems[i].getAttribute("data-product")] = parseFloat(summaryitems[i].getAttribute("data-product-count"));
             }
-            
+
             console.log(postdata);
 
             request = new XMLHttpRequest;
-            request.open('POST', './createPayment.php', true);  // `false` makes the request synchronous
+            request.open('POST', './createPayment.php', true); // `false` makes the request synchronous
             request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
             request.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -444,7 +451,7 @@
             var ua = window.navigator.userAgent;
             var msie = ua.indexOf("MSIE ");
 
-            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))  // If Internet Explorer, return version number
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) // If Internet Explorer, return version number
             {
                 alert("Øv! Vi understøtter desværre ikke Internet Explorer...");
             }
@@ -468,9 +475,6 @@
             </div> -->
 
             <div id="travellers" class="section">
-                <!-- <span>Voksen 12+<button>−</button><span>1</span><button>+</button></span><br />
-                <span>Barn 3-11<button>−</button><span>1</span><button>+</button></span><br />
-                <span>Barn 0-2<button>−</button><span>1</span><button>+</button></span><br /> -->
                 <span>
                     <span>
                         <span>Voksen 12+ år</span><br />
@@ -492,18 +496,14 @@
                     </span>
                     <input class="ticketTypeNumber" data-ticket-type="Barn 0-2 år" type="number" value="0" onchange="" />
                 </span>
-
-
-                <!-- <span><span>Barn 3-11 år<br /><span>á 22/35 kroner t/r</span></span><input class="ticketTypeNumber" data-ticket-type="Barn 3-11"  type="number" value="0" /></span>
-                <span><span>Barn 0-2 år<br /><span>Gratis</span></span><input class="ticketTypeNumber" data-ticket-type="Barn 0-2" type="number" value="0" /></span> -->
             </div>
         </div>
 
         <div class="page" id="page1">
             <h2>Vælg dato og tid</h2>
             <div id="dateContainer" style="display: flex; flex-wrap: wrap">
-            
-            <?php
+
+                <?php
 
                 $sql = "SELECT DISTINCT CAST(`stop_departure_time` AS DATE)\n"
                     . "FROM `hvb_stops` WHERE `departures__departure_id` IN (\n"
@@ -513,13 +513,13 @@
                     . ")"
                     . "ORDER BY `stop_departure_time` ASC";
 
-                if($result = $mysqli -> query($sql)) {
+                if ($result = $mysqli->query($sql)) {
                     $allDates = [];
 
                     // Fetch one and one row
                     while ($row = mysqli_fetch_row($result)) {
                         $date = $row[0];
-                        
+
                         // $allDates to be used later
                         array_push($allDates, $date);
 
@@ -530,156 +530,58 @@
 
                         " d. %d. %B"
 
-                        ?>
-                        <a onclick="radioChoose(this); dateChoose(this)" data-radioclass="dag" data-date="<?php print($row[0]) ?>"><?php print($strdate); ?></a>
-                        <!-- <a>Tirsdag<br>d. 15. oktober</a> --><?php
+                ?>
+                        <a onclick="radioChoose(this); dateChoose(this)" data-radioclass="dag" data-date="<?php print($row[0]) ?>">
+                            <?php print($strdate); ?>
+                        </a>
+                        <!-- <a>Tirsdag<br>d. 15. oktober</a> -->
+                <?php
                     }
                     mysqli_free_result($result);
                 }
 
-            ?>
+                ?>
             </div>
             <h3>Udrejse</h3>
             <div class="timeContainer">
                 <?php
-                    foreach ($allDates as &$date) {
-                        ?><div data-viewclass="<?php print($date); ?>"><?php
-                        // The use of MAX/MIN is a hotfix! Special conditions for MAX in MySQL: https://stackoverflow.com/questions/17776693/why-doesnt-my-content-field-match-my-maxid-field-in-mysql
-                        
-                        // Get first stop
-                        $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
-                        . "WHERE\n"
-                        . "    `stop_departure_time` IN (\n"
-                        . "        SELECT MIN(`stop_departure_time`) FROM `hvb_stops` GROUP BY `departures__departure_id`\n"
-                        . "    )\n"
-                        . "AND\n"
-                        . "`departures__departure_id` IN (\n"
-                        . "    SELECT `departure_id` FROM `hvb_departures` WHERE\n"
-                        . "    `trains__train_id` IN (\n"
-                        . "        SELECT `train_id` FROM `hvb_trains` WHERE `events__event_id`=1\n"
-                        . ")\n"
-                        . "    AND\n"
-                        . "    `departure_type` = 'outbond'\n"
-                        . ")\n"
-                        . "AND\n"
-                        . "CAST(`stop_departure_time` AS DATE) = ?\n"
-                        . "ORDER BY `stop_departure_time` ASC";
-                        
-                        
-                        $stmtFirstStops = $mysqli -> prepare($sql);
-                        // 
-                        $stmtFirstStops -> bind_param("s", $date);
-                        $stmtFirstStops -> execute(); // execute */
-                        $firstStopsResult = $stmtFirstStops->get_result();
-
-                        $firstStops = [];
-                        while ($row = mysqli_fetch_row($firstStopsResult)) {
-                            // [stop_name, stop_departure_time, departures__departure_id]
-                            array_push($firstStops, [$row[0], $row[1], $row[2]]);
-                        }
-                        mysqli_free_result($firstStopsResult);
-
-
-
-
-
-                        // Get last stop
-                        $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
-                        . "WHERE\n"
-                        . "    `stop_departure_time` IN (\n"
-                        . "        SELECT MAX(`stop_departure_time`) FROM `hvb_stops` GROUP BY `departures__departure_id`\n"
-                        . "    )\n"
-                        . "AND\n"
-                        . "`departures__departure_id` IN (\n"
-                        . "    SELECT `departure_id` FROM `hvb_departures` WHERE\n"
-                        . "    `trains__train_id` IN (\n"
-                        . "        SELECT `train_id` FROM `hvb_trains` WHERE `events__event_id`=1\n"
-                        . ")\n"
-                        . "    AND\n"
-                        . "    `departure_type` = 'outbond'\n"
-                        . ")\n"
-                        . "AND\n"
-                        . "CAST(`stop_departure_time` AS DATE) = ?\n"
-                        . "ORDER BY `stop_departure_time` ASC";
-                        
-                        
-                        // prepare and bind              "INSERT INTO `hvb_trains` (`train_id`, `train_seats`, `train_locomotive`, `train_compartments`, `events__event_id`) VALUES (NULL, '25', 'motor', '5', '1')"
-                        $stmtLastStops = $mysqli -> prepare($sql);
-                        // 
-                        $stmtLastStops -> bind_param("s", $date);
-                        $stmtLastStops -> execute(); // execute */
-                        $lastStopsResult = $stmtLastStops->get_result();
-
-                        $lastStops = [];
-                        while ($row = mysqli_fetch_row($lastStopsResult)) {
-                            // [stop_name, stop_departure_time]
-                            array_push($lastStops, [$row[0], $row[1], $row[2]]);
-                        }
-                        mysqli_free_result($lastStopsResult);
-                        
-                        // Check that results line up
-                        if(count($firstStops) != count($lastStops)) {
-                            print("Not matching queries!!");
-                        }
-
-                        //print("date: " . $date);
-
-                        for($i = 0; $i < count($firstStops); $i++) {
-                            if($firstStops[$i][2] != $lastStops[$i][2]) {
-                                print("Departures not matching!");
-                            }
-                            $startStop = $firstStops[$i][0];
-                            $startStopTime = mb_substr($firstStops[$i][1], 0, 5);
-                            $endStop = $lastStops[$i][0];
-                            $endStopTime = mb_substr($lastStops[$i][1], 0, 5);
-                            $departureId = $firstStops[$i][2];
-
-                            ?>
-                            <div class="time" onclick="radioChoose(this)" data-radioclass="udrejsetid" data-departureId="<?php print($departureId) ?>">
-                                <div><span><?php print($startStopTime) ?><span> fra <?php print($startStop) ?></span></span><span style="float: right"><span>til <?php print($endStop) ?> </span><?php print($endStopTime) ?></span></div>
-                                <div class="type"><span>Motor</span></div>
-                                <div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
-                            </div>
-                            <?php
-
-                        }
-
-
-                        ?></div><?php
-                    }
+                foreach ($allDates as &$date) {
                 ?>
-<!--                 
-                <div class="time" onclick="radioChoose(this)" data-radioclass="udrejsetid">
-                    <div><span>12:15<span> fra Hedehusgård</span></span><span
-                            style="float: right"><span>til Fem Ege </span>12:15</span></div>
-                            <div class="type"><span>Motor</span></div><div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span
-                                class="arrow"></span></button></div>
-                </div>                        
-                
-                <div class="time" onclick="radioChoose(this)" data-radioclass="udrejsetid">
-                    <div><span>13:45<span> fra Hedehusgård</span></span><span
-                            style="float: right"><span>til Fem Ege </span>13:45</span></div>
-                            <div class="type"><span>Motor</span></div><div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span
-                                class="arrow"></span></button></div>
-                </div>       -->      
+                    <div data-viewclass="<?php print($date); ?>">
+                        <?php
+
+                        $firstStops = getFirstStops($mysqli, $date, "outbond");
+
+                        $lastStops = getLastStops($mysqli, $date, "outbond");
+
+                        printDepartureCards($firstStops, $lastStops, "udrejsetid")
+
+                        ?>
+                    </div>
+                <?php
+                }
+                ?>
             </div>
 
             <h3>Returrejse</h3>
             <div class="timeContainer">
-                <div class="time" onclick="radioChoose(this)" data-radioclass="returrejsetid">
-                    <div><span>10:45<span> fra Fem Ege</span></span><span style="float: right"><span>til Hedehusgård </span>10:45</span></div>
-                    <div class="type"><span>Motor</span></div>
-                    <div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
-                </div>
-                <div class="time" onclick="radioChoose(this)" data-radioclass="returrejsetid">
-                    <div><span>12:45<span> fra Fem Ege</span></span><span style="float: right"><span>til Hedehusgård </span>12:45</span></div>
-                    <div class="type"><span>Motor</span></div>
-                    <div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
-                </div>
-                <div class="time" onclick="radioChoose(this)" data-radioclass="returrejsetid">
-                    <div><span>Ingen returrejse</span></div>
-                    <div><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
-                </div>
+                <?php
+                foreach ($allDates as &$date) {
+                ?>
+                    <div data-viewclass="<?php print($date); ?>">
+                        <?php
+
+                        $firstStops = getFirstStops($mysqli, $date, "homebond");
+
+                        $lastStops = getLastStops($mysqli, $date, "homebond");
+
+                        printDepartureCards($firstStops, $lastStops, "hjemrejsetid")
+
+                        ?>
+                    </div>
+                <?php
+                }
+                ?>
             </div>
         </div>
 
@@ -688,14 +590,9 @@
 
         <div class="page">
             <h2>Opsumering</h2>
-            <!--
-            <div class="info">
-                <div><span>E-mail-adresse: </span><input type="email" /></div>
-                <div><span>Gentag e-mail-adresse: </span><input type="email" /></div>
-            </div>
-            -->
             <p>
-                Du modtager dine billetter i en PDF-fil via den e-mailadresse du oplyser under betalingen på DIBS-betalingsside. Alle priser er i danske kroner (DKK).
+                Du modtager dine billetter i en PDF-fil via den e-mailadresse du oplyser under betalingen på
+                DIBS-betalingsside. Alle priser er i danske kroner (DKK).
             </p>
             <span class="italic">Udrejse</span>
             <div id="summaryUdrejse"></div>
@@ -704,12 +601,12 @@
 
             <span class="italic">Valgte billetter</span>
             <div id="summary">
-                
+
             </div>
             <div style="display: flex; justify-content: space-between; align-items: bottom; margin-top: 1em;">
                 <div>
                     <span class="italic">Betaling med DIBS</span><br />
-                    <img src="https://cdn.dibspayment.com/logo/checkout/combo/horiz/DIBS_checkout_kombo_horizontal_02.png" alt="DIBS - Payments made easy" width="450"/>
+                    <img src="https://cdn.dibspayment.com/logo/checkout/combo/horiz/DIBS_checkout_kombo_horizontal_02.png" alt="DIBS - Payments made easy" width="450" />
                 </div>
                 <button onclick="complete()" class="proceed" style="font-size: 1em;">Betaling <span class="arrow"></span></button>
             </div>
