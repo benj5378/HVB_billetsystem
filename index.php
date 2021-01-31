@@ -190,16 +190,18 @@ require "functions/getStops.php"
                 postdata["tickets"][summaryitems[i].getAttribute("data-product")] = parseFloat(summaryitems[i].getAttribute("data-product-count"));
             }
 
-            console.log(postdata);
-
             request = new XMLHttpRequest;
             request.open('POST', './createPayment.php', true); // `false` makes the request synchronous
             request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
             request.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     // Typical action to be performed when the document is ready:
-                    console.log(request.responseText);
-                    var response = JSON.parse(request.responseText);
+                    
+                    try {
+                        var response = JSON.parse(request.responseText);
+                    } catch {
+                        alert(request.responseText);
+                    }
 
                     window.location = response["hostedPaymentPageUrl"];
                 }
@@ -230,10 +232,6 @@ require "functions/getStops.php"
 
         <div class="page" id="page2">
             <h2>Vælg billetter</h2>
-            <!-- <div id="turretur" class="section">
-                <div class="turreturButton" data-option="enkelt">Enkelt<br /><span>for 35 kroner</span></div>
-                <div class="turreturButton active" data-option="retur" style="">Retur<br /><span>for 70 kroner</span></div>
-            </div> -->
 
             <div id="travellers" class="section">
                 <span>

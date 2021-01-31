@@ -3,46 +3,46 @@
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
-    
+
     $client_data = json_decode(file_get_contents('php://input'), true);
 
-    $validTicketTypes = [
+/*     $validTicketTypes = [
         "Barn 0-2 retur",
         "Barn 3-11 retur",
         "Voksen retur",
         "Barn 0-2 enkelt",
         "Barn 3-11 enkelt",
         "Voksen enkelt"
-    ];
+    ]; */
 
     // NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
     $prices = Array(
-        "Barn 0-2 retur" => Array(
+        "Barn 0-2 år retur" => Array(
             "price" => 0,
             "taxRate" => 0,
             "ref" => "4"
         ),
-        "Barn 3-11 retur" => Array(
+        "Barn 3-11 år retur" => Array(
             "price" => 35,
             "taxRate" => 0,
             "ref" => "5"
         ),
-        "Voksen retur" => Array(
+        "Voksen 12+ år retur" => Array(
             "price" => 70,
             "taxRate" => 0,
             "ref" => "6"
         ),
-        "Barn 0-2 enkelt" => Array(
+        "Barn 0-2 år enkelt" => Array(
             "price" => 0,
             "taxRate" => 0,
             "ref" => "1"            
         ),
-        "Barn 3-11 enkelt" => Array(
+        "Barn 3-11 år enkelt" => Array(
             "price" => 22,
             "taxRate" => 0,
             "ref" => "2"
         ),
-        "Voksen enkelt" => Array(
+        "Voksen 12+ år enkelt" => Array(
             "price" => 44,
             "taxRate" => 0,
             "ref" => "3"
@@ -57,7 +57,7 @@
         },
         "checkout": {
             "integrationType": "HostedPaymentPage",
-            "returnUrl": "https://lego-ev3.com/development/billetsystem_test/success.php",
+            "returnUrl": "http://192.168.0.20/success.php",
             "termsUrl": "https://ibk.dk/biletter/terms.html",
             "merchantHandlesConsumerData": false,
             "consumerType": {
@@ -68,19 +68,25 @@
         },
         "notifications": {
             "webhooks": [{
-                    "eventName": "payment.charge.created",
-                    "url": "https://lego-ev3.com/development/billetsystem_test/paymentChargeCreated.php",
+                    "eventName": "payment.reservation.created",
+                    "url": "https://lego-ev3.com/development/test/paymentChargeCreated.php",
                     "authorization": "6bLIJbqvEkjqBoUN6wWicuhPegcKR6YG"
                 }
             ]
         }
     }', true);
 
+    // Webhook for when payment has succesfully been reserved on the card
+
+
+
     $total = 0;
 
     foreach($client_data["tickets"] as $key => $value) {
-        if(!(in_array($key, $validTicketTypes) && $value >= 0 && gettype($value) == "integer")) {
-            die();
+        if(!(array_key_exists($key, $prices) && $value >= 0 && gettype($value) == "integer")) {
+            print_r($key);
+            print_r(gettype($value));
+            die("Fatal error: Not valid values");
         }
 
         array_push($datastring["order"]["items"], Array(
@@ -96,6 +102,10 @@
         $total += $value * $prices[$key]["price"];
     }
     
+    if(!$total > 0) {
+        die("Fatal error: invalid amount");
+    }
+
     $datastring["order"]["amount"] = $total * 100;  // Multiplication by 100, because 10000 is interpreted as 100.00
     //print_r(json_encode($datastring));
     //print_r("<br /><br />");
@@ -114,6 +124,6 @@
     // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
     $result = curl_exec($ch);
 
-    print_r($result);
+    print($result);
+
     //print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
-?>
