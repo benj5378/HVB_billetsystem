@@ -43,6 +43,58 @@ function getFirstStops($mysqli, $date, $departure_type)
 }
 
 
+function getFirstStop($mysqli, $departureId)
+{
+
+    // Get first stop
+    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+        . "WHERE\n"
+        . "`departures__departure_id`=?\n"
+        . "ORDER BY `stop_departure_time` ASC\n"
+        . "LIMIT 1";
+
+
+    $stmtFirstStops = $mysqli->prepare($sql);
+    $stmtFirstStops->bind_param("i", $departureId);
+    $stmtFirstStops->execute(); // execute */
+    $firstStopsResult = $stmtFirstStops->get_result();
+    $row = mysqli_fetch_row($firstStopsResult);
+
+    $firstStops = [$row[0], $row[1], $row[2]];
+
+    mysqli_free_result($firstStopsResult);
+
+    return $firstStops;
+}
+
+
+function getLastStop($mysqli, $departureId)
+{
+    global $mysqli;
+
+    // Get last stop
+    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+        . "WHERE\n"
+        . "`departures__departure_id`=?\n"
+        . "ORDER BY `stop_departure_time` DESC\n"
+        . "LIMIT 1";
+
+
+    // prepare and bind
+    $stmtLastStop = $mysqli->prepare($sql);
+    $stmtLastStop->bind_param("i", $departureId);
+    $stmtLastStop->execute(); // execute */
+    $lastStopResult = $stmtLastStop->get_result();
+    $row = mysqli_fetch_row($lastStopResult);
+
+    $lastStop = [$row[0], $row[1], $row[2]];
+
+    mysqli_free_result($lastStopResult);
+
+    return $lastStop;
+}
+
+
 function getLastStops($mysqli, $date, $departure_type)
 {
     global $mysqli;
@@ -112,14 +164,14 @@ function printDepartureCards($mysqli, $firstStops, $lastStops, $radioclass)
         $stmtTraintype->execute();
         $trainTypeResult = $stmtTraintype->get_result();
         $trainTypeEnum = mysqli_fetch_row($trainTypeResult)[0];
-        if($trainTypeEnum == "motor") {
+        if ($trainTypeEnum == "motor") {
             $trainType = "Motor";
-        } else if($trainTypeEnum == "damp") {
+        } else if ($trainTypeEnum == "damp") {
             $trainType = "Damp";
         }
 
 ?>
-        <div class="time" onclick="radioChoose(this)" data-radioclass="<?php print($radioclass) ?>" data-departureId="<?php print($departureId) ?>">
+        <div class="time" onclick="radioChoose(this);" data-radioclass="<?php print($radioclass) ?>" data-departureId="<?php print($departureId) ?>">
             <div><span>
                     <?php print($startStopTime) ?><span> fra
                         <?php print($startStop) ?>
@@ -132,7 +184,62 @@ function printDepartureCards($mysqli, $firstStops, $lastStops, $radioclass)
             <div class="type"><span><?php print($trainType) ?></span></div>
             <div><button class="timetable">Tidsplan️</button><button onclick="chooseStart()" class="buy proceed">Vælg <span class="arrow"></span></button></div>
         </div>
-<?php
+    <?php
 
     }
+}
+
+
+
+function printDepartureCards_special($mysqli, $firstStops, $lastStops, $datestr)
+{
+
+    // Check that results line up
+    if (count($firstStops) != count($lastStops)) {
+        die("Fatal error: Not matching queries!!");
+    }
+
+    $sql = "SELECT `train_locomotive` FROM `hvb_trains` WHERE `train_id` IN (SELECT `trains__train_id` FROM `hvb_departures` WHERE `departure_id`=?)";
+
+    $stmtTraintype = $mysqli->prepare($sql);
+    $stmtTraintype->bind_param("i", $departureId);
+
+
+    if ($firstStops[2] != $lastStops[2]) {
+        die("Fatal error: Departures not matching!");
+    }
+
+    $startStop = $firstStops[0];
+    $startStopTime = mb_substr($firstStops[1], 0, 5);
+    $endStop = $lastStops[0];
+    $endStopTime = mb_substr($lastStops[1], 0, 5);
+    $departureId = $firstStops[2];
+
+    $stmtTraintype->execute();
+    $trainTypeResult = $stmtTraintype->get_result();
+    $trainTypeEnum = mysqli_fetch_row($trainTypeResult)[0];
+    if ($trainTypeEnum == "motor") {
+        $trainType = "Motor";
+    } else if ($trainTypeEnum == "damp") {
+        $trainType = "Damp";
+    }
+
+    $date = date("F j, Y", strtotime($datestr));
+
+    ?>
+    <div class="time" data-departureId="<?php print($departureId) ?>">
+        <div><span>
+                <?php print($startStopTime); ?><span> fra
+                    <?php print($startStop); ?>
+                </span>
+            </span><span style="float: right"><span>til
+                    <?php print($endStop); ?>
+                </span>
+                <?php print($endStopTime); ?>
+            </span></div>
+        <div class="type"><span><?php print($trainType); ?></span></div>
+        <div><span><?php print($date); ?></span></div>
+    </div>
+<?php
+
 }

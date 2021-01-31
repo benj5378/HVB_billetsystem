@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: text/html; charset=UTF-8');
 
-$result = setlocale(LC_ALL, 'da_DK');
+setlocale(LC_ALL, 'dan'); // Windows
+// setlocale(LC_ALL, 'da_DK'); // Linux
 
 include_once("./credentials.php");
 
@@ -75,39 +76,73 @@ require "functions/getStops.php"
             // DO TIME SUMMARY
             // - DO TIME SUMMARY UDREJSE
 
-            var choosenTicketIdUdrejse = document.querySelectorAll("[data-radioclass='udrejserejsetid']").getAttribute("data-trainnumber") //document.querySelector(".time.active").getAttribute("data-train-number");
+            var choosenTicketUdrejse_departureId = document.querySelectorAll("[data-radioclass='udrejsetid'].active")[0].getAttribute("data-departureid");
 
-            document.getElementById("summaryUdrejse").innerHTML = ""; // += "<span class=\"italic\">Udtur</span><br />" + ticketHTML;
+            if (choosenTicketUdrejse_departureId != null) {
+                console.log("ved ud");
 
-            var request = new XMLHttpRequest();
-            request.open('GET', '/getTime.php?id=' + choosenTicketIdUdrejse, true); // `false` makes the request synchronous
-            request.send(null);
-            if (request.status === 200) {
-                // TO DO SKAL PARSES, idé: JSON FRA PHP
-                var ticketHTML = request.responseText; //JSON.parse(request.responseText);
+                var request_a = new XMLHttpRequest();
+                request_a.onreadystatechange = function() {
+                    if (request_a.status === 200) {
+                        console.log("started ud");
+
+                        // TO DO SKAL PARSES, idé: JSON FRA PHP
+                        var ticketHTML = request_a.responseText; //JSON.parse(request_a.responseText);
+
+
+                        document.getElementById("summaryUdrejse").innerHTML = ticketHTML;
+                        console.log("finished ud");
+                    }
+                }
+                request_a.open('GET', '/getTime.php?departureid=' + choosenTicketUdrejse_departureId, true);
+                request_a.send(null);
             }
 
             // - DO TIME SUMMARY RETURREJSE
 
-            var choosenTicketIdReturrejse = document.querySelectorAll("[data-radioclass='returrejsetid']").getAttribute("data-trainnumber") //document.querySelector(".time.active").getAttribute("data-train-number");
 
-            document.getElementById("summaryReturrejse").innerHTML = ""; // += "<span class=\"italic\">Udtur</span><br />" + ticketHTML;
 
-            // Tjek om der skal være returrejse. Hvis ja, så hent togdata på samme måde, som for udrejse
-            if (choosenTicketIdReturrejse == "ingenreturrejse") {
-                document.getElementById("summaryReturrejse").innerHTML += "Ingen returrejse"; //"<span class=\"italic\">Udtur</span><br /><div class=\"time\">Returbilletten gælder til et valgfrit tog mod Hedehusgårds</div>"
-            } else {
-                var request = new XMLHttpRequest();
-                request.open('GET', '/getTime.php?id=' + choosenTicketIdReturrejse, true); // `false` makes the request synchronous
-                request.send(null);
-                if (request.status === 200) {
-                    // TO DO SKAL PARSES, idé: JSON FRA PHP
-                    var ticketHTML = request.responseText; //JSON.parse(request.responseText);
+            if (document.getElementById("ingenReturrejse").classList.contains("active")) {
+                console.log("Ingen returrejse");
+                
+                var choosenTicketReturrejse_departureId = document.querySelectorAll("[data-radioclass='returrejsetid'].active")[0].getAttribute("data-departureid");
+
+                var request_b = new XMLHttpRequest();
+                request_b.onreadystatechange = function() {
+                    if (request_b.status === 200) {
+                        // TO DO SKAL PARSES, idé: JSON FRA PHP
+                        var ticketHTML = request_b.responseText; //JSON.parse(request_b.responseText);
+
+                        document.getElementById("summaryReturrejse").innerHTML = ticketHTML;
+                        console.log("finished retur");
+                    }
                 }
+                request_b.open('GET', '/ingenReturrejse.php', true);
+                request_b.send(null);
+            } else {
+                var choosenTicketReturrejse_departureId = document.querySelectorAll("[data-radioclass='returrejsetid'].active")[0].getAttribute("data-departureid");
+
+                var request_b = new XMLHttpRequest();
+                request_b.onreadystatechange = function() {
+                    if (request_b.status === 200) {
+                        // TO DO SKAL PARSES, idé: JSON FRA PHP
+                        var ticketHTML = request_b.responseText; //JSON.parse(request_b.responseText);
+
+                        document.getElementById("summaryReturrejse").innerHTML = ticketHTML;
+                        console.log("finished retur");
+                    }
+                }
+                request_b.open('GET', '/getTime.php?departureid=' + choosenTicketReturrejse_departureId, true);
+                request_b.send(null);
             }
         }
 
         function startUp() {
+            document.getElementById("timeContainerUdrejse").getElementsByTagName("div")[0].getElementsByTagName("div")[0].click();
+            document.getElementById("timeContainerReturrejse").getElementsByTagName("div")[0].getElementsByTagName("div")[0].click();
+
+
+
             var ticketElements = document.getElementsByClassName("ticketTypeNumber");
             for (var i = 0; i < ticketElements.length; i++) {
                 ticketElements[i].addEventListener("input", update);
@@ -132,8 +167,7 @@ require "functions/getStops.php"
             }
             origin.classList.add("active");
             if (doUpdate) {
-                //update();
-                "hej";
+                update();
             }
         }
 
@@ -190,7 +224,7 @@ require "functions/getStops.php"
 
 <body onload="msieversion(); startUp()">
     <img id="logo" src="hvb_logo_margin_negativ.svg" />
-    <div class="wrapper">
+    <div class="wrapper" style="padding-bottom: 1em">
         <h1 style="height: 140px; margin: 0">Billetter</h1>
 
 
@@ -270,7 +304,7 @@ require "functions/getStops.php"
                 ?>
             </div>
             <h3>Udrejse</h3>
-            <div class="timeContainer">
+            <div id="timeContainerUdrejse" class="timeContainer">
                 <?php
                 foreach ($allDates as &$date) {
                 ?>
@@ -281,7 +315,7 @@ require "functions/getStops.php"
 
                         $lastStops = getLastStops($mysqli, $date, "outbond");
 
-                        printDepartureCards($mysqli, $firstStops, $lastStops, "udrejsetid")
+                        printDepartureCards($mysqli, $firstStops, $lastStops, "udrejsetid");
 
                         ?>
                     </div>
@@ -291,11 +325,9 @@ require "functions/getStops.php"
             </div>
 
             <h3>Returrejse</h3>
-            <div class="timeContainer">
+            <div id="timeContainerReturrejse" class="timeContainer">
                 <div>
-                    <div class="time" onclick="radioChoose(this)" data-radioclass="hjemrejsetid">
-                        <div><span>Ingen - jeg ønsker ingen returbillet</span></div>
-                    </div>
+                    <?php require "ingenReturrejse.php" ?>
                 </div>
                 <?php
                 foreach ($allDates as &$date) {
@@ -307,7 +339,7 @@ require "functions/getStops.php"
 
                         $lastStops = getLastStops($mysqli, $date, "homebond");
 
-                        printDepartureCards($mysqli, $firstStops, $lastStops, "hjemrejsetid")
+                        printDepartureCards($mysqli, $firstStops, $lastStops, "returrejsetid")
 
                         ?>
                     </div>
@@ -327,13 +359,14 @@ require "functions/getStops.php"
                 DIBS-betalingsside. Alle priser er i danske kroner (DKK).
             </p>
             <span class="italic">Udrejse</span>
-            <div id="summaryUdrejse"></div>
+            <div id="summaryUdrejse">
+            </div>
             <span class="italic">Returrejse</span>
-            <div id="summaryReturrejse"></div>
+            <div id="summaryReturrejse">
+            </div>
 
             <span class="italic">Valgte billetter</span>
             <div id="summary">
-
             </div>
             <div style="display: flex; justify-content: space-between; align-items: bottom; margin-top: 1em;">
                 <div>
