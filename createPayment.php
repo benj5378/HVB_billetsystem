@@ -4,16 +4,20 @@
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
 
-    $client_data = json_decode(file_get_contents('php://input'), true);
+    require "functions/insertPayment.php";
 
-/*     $validTicketTypes = [
-        "Barn 0-2 retur",
-        "Barn 3-11 retur",
-        "Voksen retur",
-        "Barn 0-2 enkelt",
-        "Barn 3-11 enkelt",
-        "Voksen enkelt"
-    ]; */
+    include_once("./credentials.php");
+
+    // Create connection
+    $mysqli = new mysqli($servername, $username, $password, $db);
+
+    // Check connection
+    if ($mysqli->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+
+    $client_data = json_decode(file_get_contents('php://input'), true);
 
     // NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
     $prices = Array(
@@ -124,6 +128,45 @@
     // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
     $result = curl_exec($ch);
 
-    print($result);
+try {
+    $responseJSON = json_decode($result, true);
+} catch (Exception $e) {
+    die("Fatal error: failed to create payment");
+}
 
-    //print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+$paymentIdDibs = $responseJSON["paymentId"];
+
+$paymentId = insertPayment($mysqli, $paymentIdDibs);
+
+// Udrejse
+require "functions/getStops.php";
+$depatureId = (int)$client_data["udrejse_departureId"];
+$startStopId = getFirstStop($mysqli, $depatureId)[3];
+$lastStopId = getLastStop($mysqli, $depatureId)[3];
+
+require "functions/insertTicket.php";
+$ticketId = insertTicket($mysqli, $startStopId, $lastStopId, $paymentId);
+
+require "functions/refinePassengers.php";
+$passengers = refinePassengers($client_data["tickets"]);
+
+require "functions/insertPassengers.php";
+insertPassengers($mysqli, $ticketId, $passengers);
+
+
+// Returrejse
+if ($client_data["returrejse_departureId"] != "none") {
+    $depatureId = (int)$client_data["returrejse_departureId"];
+    $startStopId = getFirstStop($mysqli, $depatureId)[3];
+    $lastStopId = getLastStop($mysqli, $depatureId)[3];
+
+    $ticketId = insertTicket($mysqli, $startStopId, $lastStopId, $paymentId);
+
+    $passengers = refinePassengers($client_data["tickets"]);
+
+    insertPassengers($mysqli, $ticketId, $passengers);
+}
+
+
+// TO DO: kun hostedpaymenturl skal returneres
+print($result);

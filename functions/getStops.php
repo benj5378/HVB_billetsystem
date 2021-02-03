@@ -47,7 +47,7 @@ function getFirstStop($mysqli, $departureId)
 {
 
     // Get first stop
-    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id`, `stop_id` FROM `hvb_stops`\n"
         . "WHERE\n"
         . "`departures__departure_id`=?\n"
         . "ORDER BY `stop_departure_time` ASC\n"
@@ -60,7 +60,7 @@ function getFirstStop($mysqli, $departureId)
     $firstStopsResult = $stmtFirstStops->get_result();
     $row = mysqli_fetch_row($firstStopsResult);
 
-    $firstStops = [$row[0], $row[1], $row[2]];
+    $firstStops = [$row[0], $row[1], $row[2], $row[3]]; // stop_name, stop_departure_time, departure_id, stop_id
 
     mysqli_free_result($firstStopsResult);
 
@@ -73,7 +73,7 @@ function getLastStop($mysqli, $departureId)
     global $mysqli;
 
     // Get last stop
-    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id`, `stop_id` FROM `hvb_stops`\n"
         . "WHERE\n"
         . "`departures__departure_id`=?\n"
         . "ORDER BY `stop_departure_time` DESC\n"
@@ -87,7 +87,7 @@ function getLastStop($mysqli, $departureId)
     $lastStopResult = $stmtLastStop->get_result();
     $row = mysqli_fetch_row($lastStopResult);
 
-    $lastStop = [$row[0], $row[1], $row[2]];
+    $lastStop = [$row[0], $row[1], $row[2], $row[3]]; // stop_name, stop_departure_time, departure_id, stop_id
 
     mysqli_free_result($lastStopResult);
 

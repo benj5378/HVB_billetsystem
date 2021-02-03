@@ -190,6 +190,15 @@ require "functions/getStops.php"
                 postdata["tickets"][summaryitems[i].getAttribute("data-product")] = parseFloat(summaryitems[i].getAttribute("data-product-count"));
             }
 
+            var departureIdUdrejse = document.getElementById("summaryUdrejse").getElementsByTagName("div")[0].getAttribute("data-departureid");
+            postdata["udrejse_departureId"] = departureIdUdrejse;
+
+            var departureIdReturrejse = document.getElementById("summaryReturrejse").getElementsByTagName("div")[0].getAttribute("data-departureid");
+            postdata["returrejse_departureId"] = departureIdReturrejse;
+
+
+            console.log(JSON.stringify(postdata));
+
             request = new XMLHttpRequest;
             request.open('POST', './createPayment.php', true); // `false` makes the request synchronous
             request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
