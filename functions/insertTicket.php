@@ -6,7 +6,11 @@ function insertTicket(mysqli $mysqli, int $startStopId, int $endStopId, int $pay
         . "VALUES (NULL, uuid(), 0, NULL, ?, ?, ?)";
     $stmt = $mysqli->prepare($sql);
     $stmt->bind_param("iii", $startStopId, $endStopId, $paymentId);
-    $stmt->execute();
+    $succes = $stmt->execute();
+
+    if (!$succes) {
+        die($stmt->error);
+    }
 
     $ticketId = $stmt->insert_id;
 
