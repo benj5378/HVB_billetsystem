@@ -1,60 +1,60 @@
 <?php
 
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Cache-Control: post-check=0, pre-check=0", false);
-    header("Pragma: no-cache");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-    require "functions/insertPayment.php";
+require "functions/insertPayment.php";
 
-    include_once("./credentials.php");
+include_once("./credentials.php");
 
-    // Create connection
-    $mysqli = new mysqli($servername, $username, $password, $db);
+// Create connection
+$mysqli = new mysqli($servername, $username, $password, $db);
 
-    // Check connection
-    if ($mysqli->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+// Check connection
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 
-    $client_data = json_decode(file_get_contents('php://input'), true);
+$client_data = json_decode(file_get_contents('php://input'), true);
 
-    // NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
-    $prices = Array(
-        "Barn 0-2 år retur" => Array(
-            "price" => 0,
-            "taxRate" => 0,
-            "ref" => "4"
-        ),
-        "Barn 3-11 år retur" => Array(
-            "price" => 35,
-            "taxRate" => 0,
-            "ref" => "5"
-        ),
-        "Voksen 12+ år retur" => Array(
-            "price" => 70,
-            "taxRate" => 0,
-            "ref" => "6"
-        ),
-        "Barn 0-2 år enkelt" => Array(
-            "price" => 0,
-            "taxRate" => 0,
-            "ref" => "1"            
-        ),
-        "Barn 3-11 år enkelt" => Array(
-            "price" => 22,
-            "taxRate" => 0,
-            "ref" => "2"
-        ),
-        "Voksen 12+ år enkelt" => Array(
-            "price" => 44,
-            "taxRate" => 0,
-            "ref" => "3"
-        )
-    );
-    // NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
+// NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
+$prices = array(
+    "Barn 0-2 år retur" => array(
+        "price" => 0,
+        "taxRate" => 0,
+        "ref" => "4"
+    ),
+    "Barn 3-11 år retur" => array(
+        "price" => 35,
+        "taxRate" => 0,
+        "ref" => "5"
+    ),
+    "Voksen 12+ år retur" => array(
+        "price" => 70,
+        "taxRate" => 0,
+        "ref" => "6"
+    ),
+    "Barn 0-2 år enkelt" => array(
+        "price" => 0,
+        "taxRate" => 0,
+        "ref" => "1"
+    ),
+    "Barn 3-11 år enkelt" => array(
+        "price" => 22,
+        "taxRate" => 0,
+        "ref" => "2"
+    ),
+    "Voksen 12+ år enkelt" => array(
+        "price" => 44,
+        "taxRate" => 0,
+        "ref" => "3"
+    )
+);
+// NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
 
-    $datastring = json_decode('{
+$datastring = json_decode('{
         "order": {
             "items": [],
             "currency": "DKK"
@@ -80,53 +80,57 @@
         }
     }', true);
 
-    // Webhook for when payment has succesfully been reserved on the card
+// Webhook for when payment has succesfully been reserved on the card
 
 
 
-    $total = 0;
+$total = 0;
 
-    foreach($client_data["tickets"] as $key => $value) {
-        if(!(array_key_exists($key, $prices) && $value >= 0 && gettype($value) == "integer")) {
-            print_r($key);
-            print_r(gettype($value));
-            die("Fatal error: Not valid values");
-        }
-
-        array_push($datastring["order"]["items"], Array(
-            "reference" => $prices[$key]["ref"],
-            "name" => $key,
-            "quantity" => $value,
-            "unit" => "pcs",
-            "unitPrice" => $prices[$key]["price"] * 100, // Multiplication by 100, because 10000 is interpreted as 100.00,
-            "taxRate" => $prices[$key]["taxRate"],
-            "grossTotalAmount" => ($value * $prices[$key]["price"]) * 100, // Multiplication by 100, because 10000 is interpreted as 100.00
-            "netTotalAmount" => ($value * $prices[$key]["price"] - $value * $prices[$key]["price"] * ($prices[$key]["taxRate"] / 100)) * 100 // Multiplication by 100, because 10000 is interpreted as 100.00
-        ));
-        $total += $value * $prices[$key]["price"];
-    }
-    
-    if(!$total > 0) {
-        die("Fatal error: invalid amount");
+foreach ($client_data["tickets"] as $key => $value) {
+    if (!(array_key_exists($key, $prices) && $value >= 0 && gettype($value) == "integer")) {
+        print_r($key);
+        print_r(gettype($value));
+        die("Fatal error: Not valid values");
     }
 
-    $datastring["order"]["amount"] = $total * 100;  // Multiplication by 100, because 10000 is interpreted as 100.00
-    //print_r(json_encode($datastring));
-    //print_r("<br /><br />");
+    array_push($datastring["order"]["items"], array(
+        "reference" => $prices[$key]["ref"],
+        "name" => $key,
+        "quantity" => $value,
+        "unit" => "pcs",
+        "unitPrice" => $prices[$key]["price"] * 100, // Multiplication by 100, because 10000 is interpreted as 100.00,
+        "taxRate" => $prices[$key]["taxRate"],
+        "grossTotalAmount" => ($value * $prices[$key]["price"]) * 100, // Multiplication by 100, because 10000 is interpreted as 100.00
+        "netTotalAmount" => ($value * $prices[$key]["price"] - $value * $prices[$key]["price"] * ($prices[$key]["taxRate"] / 100)) * 100 // Multiplication by 100, because 10000 is interpreted as 100.00
+    ));
+    $total += $value * $prices[$key]["price"];
+}
 
-    $ch = curl_init('https://test.api.dibspayment.eu/v1/payments');
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datastring));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+if (!$total > 0) {
+    die("Fatal error: invalid amount");
+}
+
+$datastring["order"]["amount"] = $total * 100;  // Multiplication by 100, because 10000 is interpreted as 100.00
+//print_r(json_encode($datastring));
+//print_r("<br /><br />");
+
+$ch = curl_init('https://test.api.dibspayment.eu/v1/payments');
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($datastring));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt(
+    $ch,
+    CURLOPT_HTTPHEADER,
+    array(
         'Content-Type: application/json',
         'Accept: application/json',
-        'Authorization: test-secret-key-015454042c0e449984fbac913f5516d3')
-    );
-    // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // On dev server only! // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
-    // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
-    $result = curl_exec($ch);
+        'Authorization: test-secret-key-015454042c0e449984fbac913f5516d3'
+    )
+);
+// ÆNDRES ÆNDRES ÆNDRES ÆNDRES
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // On dev server only! // ÆNDRES ÆNDRES ÆNDRES ÆNDRES
+// ÆNDRES ÆNDRES ÆNDRES ÆNDRES
+$result = curl_exec($ch);
 
 try {
     $responseJSON = json_decode($result, true);

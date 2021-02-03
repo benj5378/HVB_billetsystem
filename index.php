@@ -104,7 +104,7 @@ require "functions/getStops.php"
 
             if (document.getElementById("ingenReturrejse").classList.contains("active")) {
                 console.log("Ingen returrejse");
-                
+
                 var choosenTicketReturrejse_departureId = document.querySelectorAll("[data-radioclass='returrejsetid'].active")[0].getAttribute("data-departureid");
 
                 var request_b = new XMLHttpRequest();
@@ -205,7 +205,7 @@ require "functions/getStops.php"
             request.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     // Typical action to be performed when the document is ready:
-                    
+
                     try {
                         var response = JSON.parse(request.responseText);
                     } catch {
