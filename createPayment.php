@@ -17,7 +17,27 @@ if ($mysqli->connect_error) {
 }
 
 
+
 $client_data = json_decode(file_get_contents('php://input'), true);
+
+require "functions/refinePassengers.php";
+$passengers = refinePassengers($client_data["tickets"]);
+$wantsReturrejse = $client_data["returrejse_departureId"] != "none";
+
+// Check if available seats exists
+require "functions/getDepartureInfo.php";
+$numPassengers = getPassengerCount($passengers);
+
+//  Udrejse
+if (!isNeededSeats($mysqli, $numPassengers, (int)$client_data["udrejse_departureId"])) {
+    die("Not enough seats on udrejse");
+}
+//  Returrejse
+if ($client_data["udrejse_departureId"] != "none" && !isNeededSeats($mysqli, $numPassengers, (int)$client_data["returrejse_departureId"])) {
+    die("Not enough seats on returrejse");
+}
+
+
 
 // NEW REF AT EACH MODIFICATION. SAFE PREVIOUS REFS AND PRODUCTS!
 $prices = array(
@@ -151,15 +171,13 @@ $lastStopId = getLastStop($mysqli, $depatureId)[3];
 require "functions/insertTicket.php";
 $ticketId = insertTicket($mysqli, $startStopId, $lastStopId, $paymentId);
 
-require "functions/refinePassengers.php";
-$passengers = refinePassengers($client_data["tickets"]);
 
 require "functions/insertPassengers.php";
 insertPassengers($mysqli, $ticketId, $passengers);
 
 
 // Returrejse
-if ($client_data["returrejse_departureId"] != "none") {
+if ($wantsReturrejse) {
     $depatureId = (int)$client_data["returrejse_departureId"];
     $startStopId = getFirstStop($mysqli, $depatureId)[3];
     $lastStopId = getLastStop($mysqli, $depatureId)[3];
