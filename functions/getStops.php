@@ -1,6 +1,6 @@
 <?php
 
-function getFirstStops($mysqli, $date, $departure_type)
+function getFirstStops(mysqli $mysqli, string $date, string $departure_type)
 {
 
     // The use of MAX/MIN is a hotfix! Special conditions for MAX in MySQL: https://stackoverflow.com/questions/17776693/why-doesnt-my-content-field-match-my-maxid-field-in-mysql
@@ -43,7 +43,7 @@ function getFirstStops($mysqli, $date, $departure_type)
 }
 
 
-function getFirstStop($mysqli, $departureId)
+function getFirstStop(mysqli $mysqli, int $departureId)
 {
 
     // Get first stop
@@ -68,10 +68,8 @@ function getFirstStop($mysqli, $departureId)
 }
 
 
-function getLastStop($mysqli, $departureId)
+function getLastStop(mysqli $mysqli, int $departureId)
 {
-    global $mysqli;
-
     // Get last stop
     $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id`, `stop_id` FROM `hvb_stops`\n"
         . "WHERE\n"
@@ -95,10 +93,8 @@ function getLastStop($mysqli, $departureId)
 }
 
 
-function getLastStops($mysqli, $date, $departure_type)
+function getLastStops(mysqli $mysqli, string $date, string $departure_type)
 {
-    global $mysqli;
-
     // Get last stop
     $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
         . "WHERE\n"
@@ -136,9 +132,8 @@ function getLastStops($mysqli, $date, $departure_type)
     return $lastStops;
 }
 
-function printDepartureCards($mysqli, $firstStops, $lastStops, $radioclass)
+function printDepartureCards(mysqli $mysqli, array $firstStops, array $lastStops, string $radioclass)
 {
-
     // Check that results line up
     if (count($firstStops) != count($lastStops)) {
         die("Fatal error: Not matching queries!!");
@@ -191,9 +186,8 @@ function printDepartureCards($mysqli, $firstStops, $lastStops, $radioclass)
 
 
 
-function printDepartureCards_special($mysqli, $firstStops, $lastStops, $datestr)
+function printDepartureCards_special(mysqli $mysqli, array $firstStops, array $lastStops, string $datestr)
 {
-
     // Check that results line up
     if (count($firstStops) != count($lastStops)) {
         die("Fatal error: Not matching queries!!");
