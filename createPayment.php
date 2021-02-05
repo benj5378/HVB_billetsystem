@@ -33,7 +33,7 @@ if (!isNeededSeats($mysqli, $numPassengers, (int)$client_data["udrejse_departure
     die("Not enough seats on udrejse");
 }
 //  Returrejse
-if ($client_data["udrejse_departureId"] != "none" && !isNeededSeats($mysqli, $numPassengers, (int)$client_data["returrejse_departureId"])) {
+if ($client_data["returrejse_departureId"] != "none" && !isNeededSeats($mysqli, $numPassengers, (int)$client_data["returrejse_departureId"])) {
     die("Not enough seats on returrejse");
 }
 

@@ -210,6 +210,7 @@ require_once "functions/getStops.php"
                         var response = JSON.parse(request.responseText);
                     } catch {
                         alert(request.responseText);
+                        console.log(request.responseText);
                     }
 
                     window.location = response["hostedPaymentPageUrl"];
