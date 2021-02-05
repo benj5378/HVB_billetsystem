@@ -37,7 +37,7 @@ require_once "functions/getStops.php"
                 "Barn 0-2 år": 0
             },
             "retur": {
-                "Voksen år": 70,
+                "Voksen 12+ år": 70,
                 "Barn 3-11 år": 35,
                 "Barn 0-2 år": 0
             }
@@ -50,28 +50,6 @@ require_once "functions/getStops.php"
         }
 
         function update() {
-
-            // DO PRICE SUMMARY
-            summaryElement = document.getElementById("summary");
-
-            // Get choosen ticket types
-            var ticketElements = document.getElementsByClassName("ticketTypeNumber");
-            var ticketOption = "enkelt"; //document.querySelector(".turreturButton.active").getAttribute("data-option");
-
-            summary.innerHTML = "";
-
-            var totalPrice = 0;
-
-            for (var i = 0; i < ticketElements.length; i++) {
-                var product = ticketElements[i].getAttribute("data-ticket-type") + " " + ticketOption;
-                var count = ticketElements[i].value;
-                var price = prices[ticketOption][ticketElements[i].getAttribute("data-ticket-type")] * count;
-                var html = "<div class=\"summary-item\" data-product=\"" + product + "\" data-product-count=\"" + count + "\"><div><span>" + count + " " + product + "</span><span>" + price + " kr.</span></div></div>";
-                totalPrice += price;
-                summaryElement.innerHTML += html;
-            }
-
-            summaryElement.innerHTML += "<div id=\"total\"><div><span>I alt</span><span>" + totalPrice + " kr.</span></div></div>";
 
             // DO TIME SUMMARY
             // - DO TIME SUMMARY UDREJSE
@@ -135,6 +113,35 @@ require_once "functions/getStops.php"
                 request_b.open('GET', '/getTime.php?departureid=' + choosenTicketReturrejse_departureId, true);
                 request_b.send(null);
             }
+
+            
+            // DO PRICE SUMMARY
+            summaryElement = document.getElementById("summary");
+
+            // Get choosen ticket types
+            var ticketElements = document.getElementsByClassName("ticketTypeNumber");
+            var ticketOption; // = "enkelt"; //document.querySelector(".turreturButton.active").getAttribute("data-option");
+
+            if (document.getElementById("ingenReturrejse").classList.contains("active")) {
+                ticketOption = "enkelt";
+            } else {
+                ticketOption = "retur";
+            }
+
+            summary.innerHTML = "";
+
+            var totalPrice = 0;
+
+            for (var i = 0; i < ticketElements.length; i++) {
+                var product = ticketElements[i].getAttribute("data-ticket-type") + " " + ticketOption;
+                var count = ticketElements[i].value;
+                var price = prices[ticketOption][ticketElements[i].getAttribute("data-ticket-type")] * count;
+                var html = "<div class=\"summary-item\" data-product=\"" + product + "\" data-product-count=\"" + count + "\"><div><span>" + count + " " + product + "</span><span>" + price + " kr.</span></div></div>";
+                totalPrice += price;
+                summaryElement.innerHTML += html;
+            }
+
+            summaryElement.innerHTML += "<div id=\"total\"><div><span>I alt</span><span>" + totalPrice + " kr.</span></div></div>";
         }
 
         function startUp() {
@@ -254,14 +261,14 @@ require_once "functions/getStops.php"
                 <span>
                     <span>
                         <span>Barn 3-11 år</span><br />
-                        <span class="meta">Kun udrejse: 44 kr.<br />Med returrejse: 70 kr.</span>
+                        <span class="meta">Kun udrejse: 22 kr.<br />Med returrejse: 35 kr.</span>
                     </span>
                     <input class="ticketTypeNumber" data-ticket-type="Barn 3-11 år" type="number" value="0" onchange="" />
                 </span>
                 <span>
                     <span>
                         <span>Barn 0-2 år</span><br />
-                        <span class="meta">Kun udrejse: 35 kr.<br />Med returrejse: 22 kr.</span>
+                        <span class="meta">Kun udrejse: 0 kr.<br />Med returrejse: 0 kr.</span>
                     </span>
                     <input class="ticketTypeNumber" data-ticket-type="Barn 0-2 år" type="number" value="0" onchange="" />
                 </span>
