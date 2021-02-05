@@ -15,7 +15,7 @@ if ($mysqli->connect_error) {
 }
 
 require "functions/getStops.php";
-require "functions/getDepartureInfo.php";
+require_once "functions/getDepartureInfo.php";
 
 $departureId = $_GET["departureid"];
 

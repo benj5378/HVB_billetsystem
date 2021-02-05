@@ -272,3 +272,7 @@ button:not(:first-of-type) {
 .info>div:not(:last-child) {
     margin-bottom: 0.2em;
 }
+
+.disabled {
+    display: none;
+}

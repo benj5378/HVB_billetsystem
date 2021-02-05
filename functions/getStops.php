@@ -1,5 +1,7 @@
 <?php
 
+require_once("getDepartureInfo.php");
+
 function getFirstStops(mysqli $mysqli, string $date, string $departure_type)
 {
 
@@ -165,8 +167,14 @@ function printDepartureCards(mysqli $mysqli, array $firstStops, array $lastStops
             $trainType = "Damp";
         }
 
+        if (getAvailableSeats($mysqli, $departureId) <= 0) {
+            $disabled = " disabled";
+        } else {
+            $disabled = "";
+        }
+
 ?>
-        <div class="time" onclick="radioChoose(this);" data-radioclass="<?php print($radioclass) ?>" data-departureId="<?php print($departureId) ?>">
+        <div class="time<?php print($disabled) ?>" onclick="radioChoose(this);" data-radioclass="<?php print($radioclass) ?>" data-departureId="<?php print($departureId) ?>">
             <div><span>
                     <?php print($startStopTime) ?><span> fra
                         <?php print($startStop) ?>
@@ -219,6 +227,7 @@ function printDepartureCards_special(mysqli $mysqli, array $firstStops, array $l
     }
 
     $date = date("F j, Y", strtotime($datestr));
+
 
     ?>
     <div class="time" data-departureId="<?php print($departureId) ?>">

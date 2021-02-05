@@ -14,7 +14,7 @@ if ($mysqli->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-require "functions/getStops.php"
+require_once "functions/getStops.php"
 
 
 ?>

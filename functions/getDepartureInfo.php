@@ -26,18 +26,33 @@ function getTakenSeats(mysqli $mysqli, int $departureId)
     return $numTakenSeats;
 }
 
-function isNeededSeats(mysqli $mysqli, int $numPassangers, int $departureId)
+function getProvidedSeats(mysqli $mysqli, int $departureId)
+{
+    $sql = "SELECT `train_seats` FROM `hvb_trains` WHERE `train_id` IN (SELECT `trains__train_id` FROM `hvb_departures` WHERE `departure_id`=$departureId)";
+    $result = $mysqli->query($sql);
+    $numProvidedSeats = (int)$result->fetch_row()[0];
+
+    return $numProvidedSeats;
+}
+
+function getAvailableSeats(mysqli $mysqli, int $departureId)
 {
     // Get taken seats
     $numTakenSeats = getTakenSeats($mysqli, $departureId);
 
     // Get provided seats
-    $sql = "SELECT `train_seats` FROM `hvb_trains` WHERE `train_id` IN (SELECT `trains__train_id` FROM `hvb_departures` WHERE `departure_id`=16)";
-    $result = $mysqli->query($sql);
-    $numProvidedSeats = (int)$result->fetch_row()[0];
+    $numProvidedSeats = getProvidedSeats($mysqli, $departureId);
 
     // Calculate available seats
     $numAvailableSeats = $numProvidedSeats - $numTakenSeats;
+
+    return $numAvailableSeats;
+}
+
+function isNeededSeats(mysqli $mysqli, int $numPassangers, int $departureId)
+{
+    $numAvailableSeats = getAvailableSeats($mysqli, $departureId);
+
     // Check if there is the needed seats
     if ($numPassangers <= $numAvailableSeats) {
         return true;
