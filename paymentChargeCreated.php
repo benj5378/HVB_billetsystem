@@ -2,13 +2,7 @@
 
 include_once("./credentials.php");
 
-// Create connection
-$mysqli = new mysqli($servername, $username, $password, $db);
-
-// Check connection
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require "./connect.php";
 
 $token = "6bLIJbqvEkjqBoUN6wWicuhPegcKR6YG"; // Have to be hidden before live
 $client_token = $_SERVER['HTTP_AUTHORIZATION'];

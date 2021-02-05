@@ -5,17 +5,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 require "functions/insertPayment.php";
-
-include_once("./credentials.php");
-
-// Create connection
-$mysqli = new mysqli($servername, $username, $password, $db);
-
-// Check connection
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
+require_once "./connect.php";
 
 
 $client_data = json_decode(file_get_contents('php://input'), true);
