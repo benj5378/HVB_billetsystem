@@ -1,6 +1,6 @@
 <?php
 
-include_once("./../credentials.php");
+require_once("./../credentials.php");
 
 try {
     $pdo = new PDO("mysql:host=$servername;dbname=$db", $username, $password);
@@ -20,9 +20,9 @@ if (!$auth->isLoggedIn()) {
 
         echo 'User is logged in';
     } catch (\Delight\Auth\InvalidEmailException $e) {
-        die('Wrong email address');
+        die('Wrong email address or password');
     } catch (\Delight\Auth\InvalidPasswordException $e) {
-        die('Wrong password');
+        die('Wrong email address or password');
     } catch (\Delight\Auth\EmailNotVerifiedException $e) {
         die('Email not verified');
     } catch (\Delight\Auth\TooManyRequestsException $e) {
