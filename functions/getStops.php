@@ -2,33 +2,55 @@
 
 require_once("getDepartureInfo.php");
 
-function getFirstStops(mysqli $mysqli, string $date, string $departure_type)
+function getFirstStops(mysqli $mysqli, string $date, string $departure_type = "")
 {
 
     // The use of MAX/MIN is a hotfix! Special conditions for MAX in MySQL: https://stackoverflow.com/questions/17776693/why-doesnt-my-content-field-match-my-maxid-field-in-mysql
 
     // Get first stop
-    $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
-        . "WHERE\n"
-        . "    `stop_departure_time` IN (\n"
-        . "        SELECT MIN(`stop_departure_time`) FROM `hvb_stops` GROUP BY `departures__departure_id`\n"
-        . "    )\n"
-        . "AND\n"
-        . "`departures__departure_id` IN (\n"
-        . "    SELECT `departure_id` FROM `hvb_departures` WHERE\n"
-        . "    `trains__train_id` IN (\n"
-        . "        SELECT `train_id` FROM `hvb_trains` WHERE `events__event_id`=1\n"
-        . ")\n"
-        . "    AND\n"
-        . "    `departure_type` = ?\n"
-        . ")\n"
-        . "AND\n"
-        . "CAST(`stop_departure_time` AS DATE) = ?\n"
-        . "ORDER BY `stop_departure_time` ASC";
+
+    // Overwrite sql if no departuretype is gived
+    if ($departure_type == "") {
+        $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+            . "WHERE\n"
+            . "    `stop_departure_time` IN (\n"
+            . "        SELECT MIN(`stop_departure_time`) FROM `hvb_stops` GROUP BY `departures__departure_id`\n"
+            . "    )\n"
+            . "AND\n"
+            . "`departures__departure_id` IN (\n"
+            . "    SELECT `departure_id` FROM `hvb_departures` WHERE\n"
+            . "    `trains__train_id` IN (\n"
+            . "        SELECT `train_id` FROM `hvb_trains` WHERE `events__event_id`=1\n"
+            . ")\n"
+            . ")\n"
+            . "AND\n"
+            . "CAST(`stop_departure_time` AS DATE) = ?\n"
+            . "ORDER BY `stop_departure_time` ASC";
+        $stmtFirstStops = $mysqli->prepare($sql);
+        $stmtFirstStops->bind_param("s", $date);
+    } else {
+        $sql = "SELECT `stop_name`, CAST(`stop_departure_time` as TIME), `departures__departure_id` FROM `hvb_stops`\n"
+            . "WHERE\n"
+            . "    `stop_departure_time` IN (\n"
+            . "        SELECT MIN(`stop_departure_time`) FROM `hvb_stops` GROUP BY `departures__departure_id`\n"
+            . "    )\n"
+            . "AND\n"
+            . "`departures__departure_id` IN (\n"
+            . "    SELECT `departure_id` FROM `hvb_departures` WHERE\n"
+            . "    `trains__train_id` IN (\n"
+            . "        SELECT `train_id` FROM `hvb_trains` WHERE `events__event_id`=1\n"
+            . ")\n"
+            . "    AND\n"
+            . "    `departure_type` = ?\n"
+            . ")\n"
+            . "AND\n"
+            . "CAST(`stop_departure_time` AS DATE) = ?\n"
+            . "ORDER BY `stop_departure_time` ASC";
+        $stmtFirstStops = $mysqli->prepare($sql);
+        $stmtFirstStops->bind_param("ss", $departure_type, $date);
+    }
 
 
-    $stmtFirstStops = $mysqli->prepare($sql);
-    $stmtFirstStops->bind_param("ss", $departure_type, $date);
     $stmtFirstStops->execute(); // execute */
     $firstStopsResult = $stmtFirstStops->get_result();
 

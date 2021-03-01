@@ -8,6 +8,8 @@ require_once "authenticate.php";
 <html>
 
 <head>
+    <link rel="stylesheet" href="./../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
         @import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
@@ -58,9 +60,16 @@ require_once "authenticate.php";
 
 <body>
     <div class="page">
+        <h1>Admin</h1>
+
         <a class="button blue" target="_blank" href="./create.php">Opret nye afgange <span class="arrow"></span></a>
         <a class="button blue" target="_blank" href="./view.php">Se alle afgange <span class="arrow"></span></a>
         <br />
+
+        <!--         <a class="button blue" target="_blank" href="./create.php">Opret nye afgange <span class="arrow"></span></a>
+        <a class="button blue" target="_blank" href="./view.php">Se alle afgange <span class="arrow"></span></a>
+        <br /> -->
+
         <a class="button black" href="./logout.php">Log ud</a>
     </div>
 </body>
